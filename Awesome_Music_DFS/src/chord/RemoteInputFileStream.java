@@ -1,24 +1,35 @@
-package chord;
+/**
+* RemoteInputFileStream Implements an Input Stream for big
+* files. It creates a server and return the address
+* The client must call connect() before reading
+*
+* @author  Oscar Morales-Ponce
+* @version 0.16
+* @since   03-3-2019
+*/
+
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.nio.*;
+import java.net.*;
+import java.util.concurrent.Semaphore;
+
 
 public class RemoteInputFileStream extends InputStream implements Serializable {
-  
-    private InetAddress IP;
-    private int port;
-    private Long total;
-    private Long pos;
-    InputStream input;
-    private static int BUFFER_LENGTH = 2 << 15;
+
+    public InetAddress IP;
+    public int port;
+    public int total;
+    public int pos;
+    public InputStream input;
+    public Semaphore sem;
+    private static int BUFFER_LENGTH = 1<< 16;
     /**
-     * It stores a buffer with FRAGMENT_SIZE bytes for the current reading. 
+     * It stores a buffer with FRAGMENT_SIZE bytes for the current reading.
      * This variable is useful for UDP sockets. Thus bur is the datagram
      */
     protected byte buf[];
     /**
-     * It prepares for the nuext buffer. In UDP sockets you can read nextbufer 
+     * It prepares for the nuext buffer. In UDP sockets you can read nextbufer
      * while buf is in use
      */
     protected byte nextBuf[];
@@ -26,40 +37,81 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
      * It is used to read the buffer
      */
     protected int fragment = 0;
-    
-    public void FileStream(String pathName) throws FileNotFoundException, IOException    {
-        File file = new File(pathName);
-        total = (int)file.length();	
-        pos = 0;		  
-    
-        ServerSocket serverSocket = new ServerSocket(0);
-        port = serverSocket.getLocalPort();
-        port = serverSocket.getInetAddress();
-        one = new Thread() {
-            public void run() {
-                try {
-                    
-                    Socket socket = serverSocket.accept();
-                    FileReader fileReader = new FileReader(pathName);
-                    char[] buffer = new char[BUFFER_LENGTH]; 
-                    int ret = fileReader.read(buffer, 0, BUFFER_LENGTH);
-                    while (ret == BUFFER_LENGTH)
-                    {
-                        socket.send(buffer);
-                        ret = fileReader.read(buffer, 0, BUFFER_LENGTH);
-                    }
-                    if (ret > 0)
-                        socket.send(buffer);
-                    fileReader.close();	
-                    
-                    
-                } catch(InterruptedException v) {
-                    System.out.println(v);
-                }
-            }  
-        };
+
+/**
+ * Connects to the server to provide the file
+ */
+    public void connect()
+    {
+        //this.buf  = new byte[BUFFER_LENGTH];
+        this.nextBuf  = new byte[BUFFER_LENGTH];
+        pos = 0;
+        try
+        {
+            Socket socket = new Socket(IP.getLoopbackAddress(), port);
+            input = socket.getInputStream();
+            sem = new Semaphore(1);
+            sem.acquire();
+            getBuff(fragment);
+            fragment++;
+        } catch (Exception exc) {
+            System.out.println(exc);
+        }
     }
-    
+
+    public  RemoteInputFileStream()  throws FileNotFoundException {
+
+
+    }
+
+
+
+/**
+ * Starts a server to provide the file
+ */
+    public  RemoteInputFileStream(String pathName, boolean deleteAfter) throws FileNotFoundException, IOException    {
+        File file = new File(pathName);
+        total = (int)file.length();
+        pos = 0;
+
+        try
+        {
+            ServerSocket serverSocket = new ServerSocket(0);
+            port = serverSocket.getLocalPort();
+            IP = serverSocket.getInetAddress();
+
+             new Thread() {
+                public void run() {
+                    try {
+                        Socket socket = serverSocket.accept();
+                        OutputStream socketOutputStream = socket.getOutputStream();
+                        FileInputStream is = new FileInputStream(pathName);
+                        byte[] b =new byte[BUFFER_LENGTH];
+                        while (is.available() > 0)
+                        {
+                            is.read(b);
+                            socketOutputStream.write(b);
+                        }
+                        is.close();
+                        if (deleteAfter)
+                        {
+                          file.delete();
+                        }
+                    } catch(Exception v) {
+                        System.out.println(v);
+                    }
+                }
+            }.start();
+        } catch (Exception exc) {
+            System.out.println(exc);
+        }
+    }
+
+    public  RemoteInputFileStream(String pathName) throws FileNotFoundException, IOException
+    {
+       this(pathName, false);
+    }
+
      /**
      * getNextBuff reads the buffer. It gets the data using
      * the remote method getSongChunk
@@ -69,32 +121,41 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
         new Thread()
         {
             public void run() {
-                input.read(nextBuf);
-                sem.release(); 
-                System.out.println("Read buffer");
+                try
+                {
+                         
+                    while ((Math.floor(total/BUFFER_LENGTH) <= fragment || 
+                            input.available() < BUFFER_LENGTH) && 
+                          (Math.floor(total/BUFFER_LENGTH) > fragment || 
+                           (input.available() < total % BUFFER_LENGTH))) 
+                    {
+            
+                        Thread.sleep(1);
+                     }
+                    input.read(nextBuf);
+                    sem.release();
+                }
+                catch (Exception e)
+                {
+
+                }
             }
         }.start();
-       
+
      }
-    
-    public  RemoteInputFileStream()  {
-        this.buf  = new byte[FRAGMENT_SIZE];	
-        this.nextBuf  = new byte[FRAGMENT_SIZE];
-        pos = 0;
-        Socket socket = new Socket(IP, port);
-        input = socket.getInputStream();
-    }
-    
+
+
+
 /**
      * Reads the next byte of data from the input stream.
     */
     @Override
     public synchronized int read() throws IOException {
-     
-     
-	  if (pos >= total) 
-	  {	
-            pos = 0;      
+
+
+	  if (pos >= total)
+	  {
+            pos = 0;
             return -1;
 	  }
 	  int posmod = pos % BUFFER_LENGTH;
@@ -102,22 +163,21 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
 	  {
           try
           {
-            sem.acquire(); 
-          }catch (InterruptedException exc) 
-          { 
+            sem.acquire();
+          }catch (InterruptedException exc)
+          {
                 System.out.println(exc);
           }
-	      for (int i=0; i< BUFFER_LENGTH; i++)
-		      buf[i] = nextBuf[i];
-          
+		  buf = nextBuf.clone();
+
 	      getBuff(fragment);
 	      fragment++;
 	  }
 	  int p = pos % BUFFER_LENGTH;
 	  pos++;
-      return buf[p] & 0xff; 
+      return buf[p] & 0xff;
     }
-    
+
     /**
      * Reads some number of bytes from the input stream and stores them
      * into the buffer array b.
@@ -144,9 +204,11 @@ public class RemoteInputFileStream extends InputStream implements Serializable {
 		    b[i] = (byte)read();
 	    return len;
     }
-    
+
     public int available() throws IOException
     {
 	return total - pos;
     }
+
+
 }

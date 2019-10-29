@@ -1,4 +1,3 @@
-package chord;
 import java.rmi.*;
 import java.net.*;
 import java.util.*;
@@ -6,50 +5,78 @@ import java.io.*;
 import java.nio.file.*;
 import java.math.BigInteger;
 import java.security.*;
-// import a json package
+import com.google.gson.Gson;
+import java.io.InputStream;
+import java.util.*;
 
 
 /* JSON Format
 
- {
-    "metadata" :
-    {
-        file :
-        {
-            name  : "File1"
-            numberOfPages : "3"
-            pageSize : "1024"
-            size : "2291"
-            page :
-            {
-                number : "1"
-                guid   : "22412"
-                size   : "1024"
-            }
-            page :
-            {
-                number : "2"
-                guid   : "46312"
-                size   : "1024"
-            }
-            page :
-            {
-                number : "3"
-                guid   : "93719"
-                size   : "243"
-            }
-        }
-    }
-}
- 
- 
- */
+{"file":
+  [
+     {"name":"MyFile",
+      "size":128000000,
+      "pages":
+      [
+         {
+            "guid":11,
+            "size":64000000
+         },
+         {
+            "guid":13,
+            "size":64000000
+         }
+      ]
+      }
+   ]
+} 
+*/
 
 
 public class DFS
 {
+    
+
+    public class PagesJson
+    {
+        Long guid;
+        Long size;
+        public PagesJson()
+        {
+            
+        }
+        // getters
+        // setters
+    };
+
+    public class FileJson 
+    {
+        String name;
+        Long   size;
+        ArrayList<PagesJson> pages;
+        public FileJson()
+        {
+            
+        }
+        // getters
+        // setters
+    };
+    
+    public class FilesJson 
+    {
+         List<FileJson> file;
+         public FilesJson() 
+         {
+             
+         }
+        // getters
+        // setters
+    };
+    
+    
     int port;
     Chord  chord;
+    
     
     private long md5(String objectName)
     {
@@ -74,53 +101,120 @@ public class DFS
     public DFS(int port) throws Exception
     {
         
+        
         this.port = port;
         long guid = md5("" + port);
         chord = new Chord(port, guid);
         Files.createDirectories(Paths.get(guid+"/repository"));
+        Files.createDirectories(Paths.get(guid+"/tmp"));
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            public void run() {
+                chord.leave();
+            }
+        });
+        
     }
     
-    public  void join(String Ip, int port) throws Exception
+  
+/**
+ * Join the chord
+  *
+ */
+    public void join(String Ip, int port) throws Exception
     {
         chord.joinRing(Ip, port);
         chord.print();
     }
     
-  /*  public JSonParser readMetaData() throws Exception
+    
+   /**
+ * leave the chord
+  *
+ */ 
+    public void leave() throws Exception
+    {        
+       chord.leave();
+    }
+  
+   /**
+ * print the status of the peer in the chord
+  *
+ */
+    public void print() throws Exception
     {
-        JsonParser jsonParser _ null;
-        long guid = md5("Metadata");
-        ChordMessageInterface peer = chord.locateSuccessor(guid);
-        InputStream metadataraw = peer.get(guid);
-        // jsonParser = Json.createParser(metadataraw);
-        return jsonParser;
+        chord.print();
     }
     
-    public void writeMetaData(InputStream stream) throws Exception
+/**
+ * readMetaData read the metadata from the chord
+  *
+ */
+    public FilesJson readMetaData() throws Exception
     {
-        JsonParser jsonParser _ null;
+        FilesJson filesJson = null;
+        try {
+            Gson gson = new Gson();
+            long guid = md5("Metadata");
+
+            System.out.println("GUID " + guid);
+            ChordMessageInterface peer = chord.locateSuccessor(guid);
+            RemoteInputFileStream metadataraw = peer.get(guid);
+            metadataraw.connect();
+            Scanner scan = new Scanner(metadataraw);
+            scan.useDelimiter("\\A");
+            String strMetaData = scan.next();
+            System.out.println(strMetaData);
+            filesJson= gson.fromJson(strMetaData, FilesJson.class);
+        } catch (Exception ex)
+        {
+            filesJson = new FilesJson();
+        }
+        return filesJson;
+    }
+    
+/**
+ * writeMetaData write the metadata back to the chord
+  *
+ */
+    public void writeMetaData(FilesJson filesJson) throws Exception
+    {
         long guid = md5("Metadata");
         ChordMessageInterface peer = chord.locateSuccessor(guid);
-        peer.put(guid, stream);
+        
+        Gson gson = new Gson();
+        peer.put(guid, gson.toJson(filesJson));
     }
-   */
-    public void mv(String oldName, String newName) throws Exception
+   
+/**
+ * Change Name
+  *
+ */
+    public void move(String oldName, String newName) throws Exception
     {
         // TODO:  Change the name in Metadata
         // Write Metadata
     }
 
-    
-    public String ls() throws Exception
+  
+/**
+ * List the files in the system
+  *
+ * @param filename Name of the file
+ */
+    public String lists() throws Exception
     {
+        FilesJson fileJson = readMetaData();
         String listOfFiles = "";
-       // TODO: returns all the files in the Metadata
-       // JsonParser jp = readMetaData();
+ 
         return listOfFiles;
     }
 
-    
-    public void touch(String fileName) throws Exception
+/**
+ * create an empty file 
+  *
+ * @param filename Name of the file
+ */
+    public void create(String fileName) throws Exception
     {
          // TODO: Create the file fileName by adding a new entry to the Metadata
         // Write Metadata
@@ -128,43 +222,37 @@ public class DFS
         
         
     }
+    
+/**
+ * delete file 
+  *
+ * @param filename Name of the file
+ */
     public void delete(String fileName) throws Exception
     {
-        // TODO: remove all the pages in the entry fileName in the Metadata and then the entry
-        // for each page in Metadata.filename
-        //     peer = chord.locateSuccessor(page.guid);
-        //     peer.delete(page.guid)
-        // delete Metadata.filename
-        // Write Metadata
-
+     
         
     }
     
-    public Byte[] read(String fileName, int pageNumber) throws Exception
+/**
+ * Read block pageNumber of fileName 
+  *
+ * @param filename Name of the file
+ * @param pageNumber number of block. 
+ */
+    public RemoteInputFileStream read(String fileName, int pageNumber) throws Exception
     {
-        // TODO: read pageNumber from fileName
         return null;
     }
     
-    
-    public Byte[] tail(String fileName) throws Exception
+ /**
+ * Add a page to the file                
+  *
+ * @param filename Name of the file
+ * @param data RemoteInputStream. 
+ */
+    public void append(String filename, RemoteInputFileStream data) throws Exception
     {
-        // TODO: return the last page of the fileName
-        return null;
-    }
-    public Byte[] head(String fileName) throws Exception
-    {
-        // TODO: return the first page of the fileName
-        return null;
-    }
-    public void append(String filename, Byte[] data) throws Exception
-    {
-        // TODO: append data to fileName. If it is needed, add a new page.
-        // Let guid be the last page in Metadata.filename
-        //ChordMessageInterface peer = chord.locateSuccessor(guid);
-        //peer.put(guid, data);
-        // Write Metadata
-
         
     }
     
