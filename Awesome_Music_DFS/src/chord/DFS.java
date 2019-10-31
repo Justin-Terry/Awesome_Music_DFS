@@ -10,6 +10,7 @@ import java.security.*;
 import com.google.gson.Gson;
 import java.io.InputStream;
 import java.util.*;
+import java.sql.Timestamp;
 
 
 /* JSON Format
@@ -39,17 +40,83 @@ public class DFS
 {
     
 
-    public class PagesJson
-    {
-        Long guid;
-        Long size;
-        public PagesJson()
-        {
-            
-        }
-        // getters
-        // setters
-    };
+	public class PagesJson {
+		// [{"guid":"46312", "size": "1024", "creationTS":"1256933732","readTS":"1256953732", "writeTS":"1256953732", "referenceCount
+			private long guid;
+			private int size;
+			private Timestamp creationTS;
+			private Timestamp readTS;
+			private Timestamp writeTS;
+			private int referenceCount;
+			
+			PagesJson(long guid, int size, Timestamp creationTS, Timestamp writeTS, int referenceCount)
+			{
+				this.guid = guid;
+				this.size = size;
+				this.creationTS = creationTS;
+				this.readTS = new Timestamp(System.currentTimeMillis());
+				this.writeTS = writeTS;
+				this.referenceCount = referenceCount;
+			}
+
+			PagesJson(String name, Timestamp stamp, int size)
+			{
+				this.guid = md5(name+stamp.toString());
+				this.size = size;
+				this.creationTS = new Timestamp(System.currentTimeMillis());
+				this.readTS = new Timestamp(System.currentTimeMillis());
+				this.referenceCount = 0;
+			}
+			
+			
+			public long getGuid() {
+				return guid;
+			}
+
+			public void setGuid(long guid) {
+				this.guid = guid;
+			}
+
+			public int getSize() {
+				return size;
+			}
+
+			public void setSize(int size) {
+				this.size = size;
+			}
+
+			public Timestamp getCreationTS() {
+				return creationTS;
+			}
+
+			public void setCreationTS(Timestamp creationTS) {
+				this.creationTS = creationTS;
+			}
+
+			public Timestamp getReadTS() {
+				return readTS;
+			}
+
+			public void setReadTS(Timestamp readTS) {
+				this.readTS = readTS;
+			}
+
+			public Timestamp getWriteTS() {
+				return writeTS;
+			}
+
+			public void setWriteTS(Timestamp writeTS) {
+				this.writeTS = writeTS;
+			}
+
+			public int getReferenceCount() {
+				return referenceCount;
+			}
+
+			public void setReferenceCount(int referenceCount) {
+				this.referenceCount = referenceCount;
+			}
+	}
 
     public class FileJson 
     {
@@ -257,5 +324,12 @@ public class DFS
     {
         
     }
+
+
+
+public static PagesJson PagesJson(String string, Timestamp timestamp, int i) {
+	// TODO Auto-generated method stub
+	return null;
+}
     
 }
