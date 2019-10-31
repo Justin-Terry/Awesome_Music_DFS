@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import java.io.InputStream;
 import java.util.*;
 import java.sql.Timestamp;
+import java.time.Instant;
 
 
 /* JSON Format
@@ -118,17 +119,122 @@ public class DFS
 			}
 	}
 
-    public class FileJson 
-    {
-        String name;
-        Long   size;
-        ArrayList<PagesJson> pages;
-        public FileJson()
-        {
-            
+	public class FileJson {  	
+        private String name;
+        private Timestamp creationTS;
+        private Timestamp readTS;
+        private Timestamp writeTS;
+        private Long referenceCount;
+        private Long numberOfPages;
+        private Long maxPageSize;
+        private Long size;
+        private ArrayList<PagesJson> pages;
+        
+        public FileJson(String filename, ArrayList<PagesJson> pages) {
+        	this.name = filename;
+        	this.pages = pages;
+        	this.creationTS = Timestamp.from(Instant.now());
+        	this.readTS = this.creationTS;
+        	this.writeTS = this.creationTS;
+        	this.referenceCount = 0l;
+        	this.numberOfPages = (long) pages.size();
+        	this.size = calcSize();
+        	this.maxPageSize = 1024l;
         }
-        // getters
-        // setters
+                    
+        public FileJson(String name, Timestamp creationTS, Timestamp readTS, Timestamp writeTS, Long referenceCount,
+				Long numberOfPages, Long maxPageSize, Long size, ArrayList<PagesJson> pages) {
+			this.name = name;
+			this.creationTS = creationTS;
+			this.readTS = readTS;
+			this.writeTS = writeTS;
+			this.referenceCount = referenceCount;
+			this.numberOfPages = numberOfPages;
+			this.maxPageSize = maxPageSize;
+			this.size = size;
+			this.pages = pages;
+		}
+
+		private long calcSize() {
+        	long s = 0l;
+        	for(PagesJson page : pages) {
+        		s += page.size;
+        	}
+        	return s;
+        }
+
+		public String getName() {
+			return name;
+		}
+
+		public void setName(String name) {
+			this.name = name;
+		}
+
+		public Timestamp getCreationTS() {
+			return creationTS;
+		}
+
+		public void setCreationTS(Timestamp creationTS) {
+			this.creationTS = creationTS;
+		}
+
+		public Timestamp getReadTS() {
+			return readTS;
+		}
+
+		public void setReadTS(Timestamp readTS) {
+			this.readTS = readTS;
+		}
+
+		public Timestamp getWriteTS() {
+			return writeTS;
+		}
+
+		public void setWriteTS(Timestamp writeTS) {
+			this.writeTS = writeTS;
+		}
+
+		public Long getReferenceCount() {
+			return referenceCount;
+		}
+
+		public void setReferenceCount(Long referenceCount) {
+			this.referenceCount = referenceCount;
+		}
+
+		public Long getNumberOfPages() {
+			return numberOfPages;
+		}
+
+		public void setNumberOfPages(Long numberOfPages) {
+			this.numberOfPages = numberOfPages;
+		}
+
+		public Long getMaxPageSize() {
+			return maxPageSize;
+		}
+
+		public void setMaxPageSize(Long maxPageSize) {
+			this.maxPageSize = maxPageSize;
+		}
+
+		public Long getSize() {
+			return size;
+		}
+
+		public void setSize(Long size) {
+			this.size = size;
+		}
+
+		public ArrayList<PagesJson> getPages() {
+			return pages;
+		}
+
+		public void setPages(ArrayList<PagesJson> pages) {
+			this.pages = pages;
+		}
+        
     };
     
     public class FilesJson 
