@@ -46,6 +46,9 @@ public class DFSCommand
             {
                 dfs.leave();     
             }
+            if(result[0].equals("test")) {
+            	// Perform test
+            }
             line=buffer.readLine();  
         }
             // User interface:

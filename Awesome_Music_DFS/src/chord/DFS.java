@@ -244,6 +244,9 @@ public class DFS
 		public void setFile(List<FileJson> file) {
 			this.file = file;
 		}
+		public void addFileJson(FileJson fileJson) {
+			this.file.add(fileJson);
+		}
 //		public void addNewFile(File f) {
 //             file.add(new FileJson(f));
 //         }    
@@ -392,11 +395,19 @@ public class DFS
  */
     public void create(String fileName) throws Exception
     {
-         // TODO: Create the file fileName by adding a new entry to the Metadata
-        // Write Metadata
-
-        
-        
+    	// Get the metadata
+    	FilesJson file = this.readMetaData();
+    	// Check if a file with that name already exists
+    	for(FileJson fj : file.getFile()) {
+    		if(fj.getName().equals(fileName)) {
+    			// That file already exists, return
+    			System.out.println("A file with the name " + fileName + " already exists");
+    			return;
+    		}
+    	}
+    	// Add the new file to the metadata and write the metadata to file
+    	file.addFileJson(new FileJson(fileName, new ArrayList<PagesJson>()));
+    	this.writeMetaData(file);
     }
     
 /**
@@ -406,8 +417,19 @@ public class DFS
  */
     public void delete(String fileName) throws Exception
     {
-     
-        
+    	// Get the metadata
+    	FilesJson file = this.readMetaData();
+    	// Attempt to find the file in the meta data
+    	for(FileJson fj : file.getFile()) {
+    		if(fj.getName().equals(fileName)) {
+    			// Found the file, delete it and rewrite the metadata
+    			file.getFile().remove(fj);
+    			this.writeMetaData(file);
+    			return;
+    		}
+    	}
+    	// File wasn't found in the metadata
+    	System.out.println(fileName + " does not exist in Metadata");
     }
     
 /**
