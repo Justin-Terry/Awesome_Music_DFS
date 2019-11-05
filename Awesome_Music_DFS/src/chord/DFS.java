@@ -50,22 +50,20 @@ public class DFS
 			private Timestamp writeTS;
 			private int referenceCount;
 			
-			PagesJson(long guid, int size, Timestamp creationTS, Timestamp writeTS, int referenceCount)
+			PagesJson(long guid, int size, int referenceCount)
 			{
 				this.guid = guid;
 				this.size = size;
 				this.creationTS = creationTS;
-				this.readTS = new Timestamp(System.currentTimeMillis());
-				this.writeTS = writeTS;
-				this.referenceCount = referenceCount;
+				this.readTS = new Timestamp(System.currentTimeMillis());this.referenceCount = referenceCount;
 			}
 
-			PagesJson(String name, Timestamp stamp, int size)
+			PagesJson(String name, int size)
 			{
-				this.guid = md5(name+stamp.toString());
-				this.size = size;
+
 				this.creationTS = new Timestamp(System.currentTimeMillis());
-				this.readTS = new Timestamp(System.currentTimeMillis());
+				this.guid = md5(name+creationTS.toString());
+				this.size = size;
 				this.referenceCount = 0;
 			}
 			
@@ -134,20 +132,16 @@ public class DFS
         	this.name = filename;
         	this.pages = pages;
         	this.creationTS = Timestamp.from(Instant.now());
-        	this.readTS = this.creationTS;
-        	this.writeTS = this.creationTS;
         	this.referenceCount = 0l;
         	this.numberOfPages = (long) pages.size();
         	this.size = calcSize();
         	this.maxPageSize = 1024l;
         }
                     
-        public FileJson(String name, Timestamp creationTS, Timestamp readTS, Timestamp writeTS, Long referenceCount,
+        public FileJson(String name, Timestamp creationTS, Long referenceCount,
 				Long numberOfPages, Long maxPageSize, Long size, ArrayList<PagesJson> pages) {
 			this.name = name;
 			this.creationTS = creationTS;
-			this.readTS = readTS;
-			this.writeTS = writeTS;
 			this.referenceCount = referenceCount;
 			this.numberOfPages = numberOfPages;
 			this.maxPageSize = maxPageSize;
@@ -242,10 +236,17 @@ public class DFS
          List<FileJson> file;
          public FilesJson() 
          {
-             
+             file = new ArrayList<FileJson>();
          }
-        // getters
-        // setters
+         public List<FileJson> getFile() {
+			return file;
+		}
+		public void setFile(List<FileJson> file) {
+			this.file = file;
+		}
+//		public void addNewFile(File f) {
+//             file.add(new FileJson(f));
+//         }    
     };
     
     
