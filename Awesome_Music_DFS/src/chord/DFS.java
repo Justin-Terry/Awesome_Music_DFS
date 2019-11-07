@@ -416,6 +416,16 @@ public class DFS {
 	 * @param pageNumber number of block.
 	 */
 	public RemoteInputFileStream read(String fileName, int pageNumber) throws Exception {
+		FilesJson files = this.readMetaData();
+		for (FileJson fj: files.getFile()) {
+			if (fj.getName().equals(fileName)) {
+				ArrayList<PagesJson> arr = fj.getPages();
+				long pageGUID = arr.get(pageNumber).getGuid();
+				ChordMessageInterface cmi = chord.locateSuccessor(pageGUID);
+				arr.get(pageNumber).setReadTS(new Timestamp(System.currentTimeMillis()));
+				return cmi.get(pageGUID);
+			}
+		}
 		return null;
 	}
 
