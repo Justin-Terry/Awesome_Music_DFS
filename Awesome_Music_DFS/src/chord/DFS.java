@@ -44,27 +44,29 @@ public class DFS
 	public class PagesJson {
 		// [{"guid":"46312", "size": "1024", "creationTS":"1256933732","readTS":"1256953732", "writeTS":"1256953732", "referenceCount
 			private long guid;
-			private int size;
+			private long size;
 			private Timestamp creationTS;
 			private Timestamp readTS;
 			private Timestamp writeTS;
 			private int referenceCount;
 			
-			PagesJson(long guid, int size, int referenceCount)
+			PagesJson(long guid, long size, int referenceCount, Timestamp creationTS, Timestamp writeTS)
 			{
 				this.guid = guid;
 				this.size = size;
 				this.creationTS = creationTS;
 				this.readTS = new Timestamp(System.currentTimeMillis());this.referenceCount = referenceCount;
+				this.writeTS = writeTS;
 			}
 
-			PagesJson(String name, int size)
+			PagesJson(String name, long size)
 			{
 
 				this.creationTS = new Timestamp(System.currentTimeMillis());
 				this.guid = md5(name+creationTS.toString());
 				this.size = size;
 				this.referenceCount = 0;
+				readTS = creationTS;
 			}
 			
 			
@@ -76,7 +78,7 @@ public class DFS
 				this.guid = guid;
 			}
 
-			public int getSize() {
+			public long getSize() {
 				return size;
 			}
 
@@ -449,8 +451,28 @@ public class DFS
  * @param filename Name of the file
  * @param data RemoteInputStream. 
  */
-    public void append(String filename, RemoteInputFileStream data) throws Exception
+    public void append(String fileName, RemoteInputFileStream data) throws Exception
     {
+        FilesJson file = this.readMetaData();
+        for(int i = 0; i < file.getFile().size(); i++) {
+    		if(file.getFile().get(i).getName().equals(fileName)) {
+    				int size = data.total;
+    				do {
+    					if(data.total > file.getFile().get(i).getMaxPageSize()) {
+    		    			
+    					file.getFile().get(i).getPages().add(new PagesJson(fileName, file.getFile().get(i).getMaxPageSize()));
+    					} else {
+    						file.getFile().get(i).getPages().add(new PagesJson(fileName, size));
+        					
+    					}
+    					size -= file.getFile().get(i).getMaxPageSize();
+    					
+    				} while(size > 0);
+    			
+    			this.writeMetaData(file);
+    			file.getFile().get(i).setWriteTS(new Timestamp(System.currentTimeMillis()));
+    		} 
+    	}
         
     }
 
