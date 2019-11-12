@@ -385,7 +385,7 @@
  	 */
  	public String lists() throws Exception {
  		FilesJson fileJson = readMetaData();
- 		String listOfFiles = "";
+ 		String listOfFiles = fileJson.toString();
 
  		return listOfFiles;
  	}

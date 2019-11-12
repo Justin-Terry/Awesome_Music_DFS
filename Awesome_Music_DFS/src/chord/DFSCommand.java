@@ -39,7 +39,7 @@ public class DFSCommand
             }
             if (result[0].equals("ls"))
             {
-                dfs.lists();     
+                System.out.println(dfs.lists());     
             }
             
             if (result[0].equals("leave"))
@@ -48,6 +48,9 @@ public class DFSCommand
             }
             if(result[0].equals("test")) {
             	// Perform test
+            }
+            if(result[0].equals("create") && result.length > 1) {
+            	dfs.create(result[1]);
             }
             line=buffer.readLine();  
         }
