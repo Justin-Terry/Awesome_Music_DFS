@@ -456,7 +456,7 @@
  		FilesJson file = readMetaData();
  		for (int i = 0; i < file.getFile().size(); i++) {
  			if (file.getFile().get(i).getName().equals(fileName)) {
- 				file.getFile().get(i).getPages().set(i, new PagesJson(fileName, data.total));
+ 				file.getFile().get(i).getPages().set(pageNumber, new PagesJson(fileName, data.total));
 
  				file.getFile().get(i).setWriteTS(new Timestamp(System.currentTimeMillis()));
  				this.writeMetaData(file);
@@ -475,18 +475,7 @@
  		for (int i = 0; i < file.getFile().size(); i++) {
  			if (file.getFile().get(i).getName().equals(fileName)) {
  				int size = data.total;
- 				do {
- 					if (data.total > file.getFile().get(i).getMaxPageSize()) {
-
- 						file.getFile().get(i).getPages()
- 								.add(new PagesJson(fileName, file.getFile().get(i).getMaxPageSize()));
- 					} else {
- 						file.getFile().get(i).getPages().add(new PagesJson(fileName, size));
-
- 					}
- 					size -= file.getFile().get(i).getMaxPageSize();
-
- 				} while (size > 0);
+ 				file.getFile().get(i).getPages().add(new PagesJson(fileName, size));
  				file.getFile().get(i).setWriteTS(new Timestamp(System.currentTimeMillis()));
  				this.writeMetaData(file);
  			}
