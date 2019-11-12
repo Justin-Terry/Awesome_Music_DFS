@@ -55,7 +55,8 @@ public class DFS
 				this.guid = guid;
 				this.size = size;
 				this.creationTS = creationTS;
-				this.readTS = new Timestamp(System.currentTimeMillis());this.referenceCount = referenceCount;
+				this.readTS = new Timestamp(System.currentTimeMillis());
+				this.referenceCount = referenceCount;
 			}
 
 			PagesJson(String name, int size)
@@ -365,13 +366,21 @@ public class DFS
     }
    
 /**
- * Change Name
+ * Change Name & update Write timestamp
   *
  */
     public void move(String oldName, String newName) throws Exception
     {
         // TODO:  Change the name in Metadata
         // Write Metadata
+    	FilesJson file = readMetaData();
+    	for(FileJson files : file.getFile()) {
+    		if(files.getName().equals(oldName)) {
+    			// That file already exists, return
+    			files.setName(newName);
+    			files.setWriteTS(new Timestamp(System.currentTimeMillis()));
+    		}
+    	}
     }
 
   
