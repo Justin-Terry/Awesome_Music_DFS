@@ -456,7 +456,8 @@
  		FilesJson file = readMetaData();
  		for (int i = 0; i < file.getFile().size(); i++) {
  			if (file.getFile().get(i).getName().equals(fileName)) {
- 				file.getFile().get(i).getPages().set(pageNumber, new PagesJson(fileName, data.total));
+ 				file.getFile().get(i).getPages().set(pageNumber
+ 						, new PagesJson(fileName, data.total));
 
  				file.getFile().get(i).setWriteTS(new Timestamp(System.currentTimeMillis()));
  				this.writeMetaData(file);
@@ -481,6 +482,7 @@
  			}
  		}
 
+ 		
  	}
 
  	public static PagesJson PagesJson(String string, Timestamp timestamp, int i) {
