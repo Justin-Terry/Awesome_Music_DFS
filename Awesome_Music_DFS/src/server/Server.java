@@ -19,9 +19,9 @@ public class Server extends Thread {
 	private byte[] buf;
 
 	// Creates server and assigns it to a port, 3000.
-	public Server() {
+	public Server(int port) {
 		try {
-			socket = new DatagramSocket(3000);
+			socket = new DatagramSocket(port);
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

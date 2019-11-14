@@ -7,6 +7,9 @@ import com.google.gson.stream.*;
 
 import chord.DFS.PagesJson;
 import models.Record;
+import server.Server;
+import server.SongLibrary;
+
 import java.sql.Timestamp;
 
 
@@ -16,6 +19,11 @@ public class DFSCommand
     DFS dfs;
         
     public DFSCommand(int p, int portToJoin) throws Exception {
+    	  
+        System.out.println("1");
+        SongLibrary.getInstance();
+        System.out.println("2");
+		new Server(p).start();
         dfs = new DFS(p);
         
         if (portToJoin > 0)
@@ -52,7 +60,12 @@ public class DFSCommand
             if(result[0].equals("create") && result.length > 1) {
             	dfs.create(result[1]);
             }
-            line=buffer.readLine();  
+            if(result[0].equals("append")) {
+            	dfs.append(result[1], new RemoteInputFileStream());
+            }
+            line=buffer.readLine();
+            
+            
         }
             // User interface:
             // join, ls, touch, delete, read, tail, head, append, move
@@ -77,5 +90,7 @@ public class DFSCommand
         {
             DFSCommand dfsCommand=new DFSCommand( Integer.parseInt(args[0]), 0);
         }
+        
+        
      } 
 }
