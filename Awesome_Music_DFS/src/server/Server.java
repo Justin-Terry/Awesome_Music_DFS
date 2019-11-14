@@ -5,6 +5,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+import chord.DFSCommand;
+
 /**
  * LoginServices Class
  * 
@@ -17,9 +19,10 @@ public class Server extends Thread {
 	private DatagramSocket socket;
 	private boolean running;
 	private byte[] buf;
+	DFSCommand dfsCommand;
 
 	// Creates server and assigns it to a port, 3000.
-	public Server(int port) {
+	public Server(int port) throws Exception {
 		try {
 			socket = new DatagramSocket(port);
 		} catch (SocketException e) {
@@ -32,6 +35,13 @@ public class Server extends Thread {
 	public void run() {
 		System.out.println("Server Up");
 		running = true;
+
+		try {
+			dfsCommand = new DFSCommand(socket.getLocalPort()+1000, 0);
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 		while (running) {
 			// This byte buffer may need to be adjusted for our application
 			buf = new byte[BUF_LENGTH];

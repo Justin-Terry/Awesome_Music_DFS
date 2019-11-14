@@ -20,10 +20,6 @@ public class DFSCommand
         
     public DFSCommand(int p, int portToJoin) throws Exception {
     	  
-        System.out.println("1");
-        SongLibrary.getInstance();
-        System.out.println("2");
-		new Server(p).start();
         dfs = new DFS(p);
         
         if (portToJoin > 0)
@@ -71,26 +67,26 @@ public class DFSCommand
             // join, ls, touch, delete, read, tail, head, append, move
     }
     
-    static public void main(String args[]) throws Exception
-    {
-        Gson gson = new Gson();
-        RemoteInputFileStream in = new RemoteInputFileStream("./src/resources/music.json", false);
-        in.connect();
-        Reader targetReader = new InputStreamReader(in);
-        JsonReader jreader = new  JsonReader(targetReader);
-        Record[] music = gson.fromJson(jreader, Record[].class);
-        
-        if (args.length < 1 ) {
-            throw new IllegalArgumentException("Parameter: <port> <portToJoin>");
-        }
-        if (args.length > 1 ) {
-            DFSCommand dfsCommand=new DFSCommand(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
-        }
-        else
-        {
-            DFSCommand dfsCommand=new DFSCommand( Integer.parseInt(args[0]), 0);
-        }
-        
-        
-     } 
+//    static public void main(String args[]) throws Exception
+//    {
+//        Gson gson = new Gson();
+//        RemoteInputFileStream in = new RemoteInputFileStream("./src/resources/music.json", false);
+//        in.connect();
+//        Reader targetReader = new InputStreamReader(in);
+//        JsonReader jreader = new  JsonReader(targetReader);
+//        Record[] music = gson.fromJson(jreader, Record[].class);
+//        
+//        if (args.length < 1 ) {
+//            throw new IllegalArgumentException("Parameter: <port> <portToJoin>");
+//        }
+//        if (args.length > 1 ) {
+//            DFSCommand dfsCommand=new DFSCommand(Integer.parseInt(args[0]), Integer.parseInt(args[1]));
+//        }
+//        else
+//        {
+//            DFSCommand dfsCommand=new DFSCommand( Integer.parseInt(args[0]), 0);
+//        }
+//        
+//        
+//     } 
 }
