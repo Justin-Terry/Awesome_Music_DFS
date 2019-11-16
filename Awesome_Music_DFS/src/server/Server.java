@@ -5,6 +5,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+import chord.DFS;
 import chord.DFSCommand;
 
 /**
@@ -19,12 +20,18 @@ public class Server extends Thread {
 	private DatagramSocket socket;
 	private boolean running;
 	private byte[] buf;
-	DFSCommand dfsCommand;
+	private DFS dfs;
+	private int port, chordPort, chordJoinedTo;
 
 	// Creates server and assigns it to a port, 3000.
-	public Server(int port) throws Exception {
+	public Server(int port, int chordPort, int portToJoin) throws Exception {
 		try {
+			dfs = new DFS(chordPort);
+			dfs.join("127.0.0.1", portToJoin);
 			socket = new DatagramSocket(port);
+			this.port = port;
+			this.chordPort = chordPort;
+			this.chordJoinedTo = portToJoin;
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -33,15 +40,8 @@ public class Server extends Thread {
 
 	// Starts a thread for the server and gets it running
 	public void run() {
-		System.out.println("Server Up");
 		running = true;
-
-		try {
-			dfsCommand = new DFSCommand(socket.getLocalPort()+1000, 0);
-		} catch (Exception e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+		this.displayDetails();
 		while (running) {
 			// This byte buffer may need to be adjusted for our application
 			buf = new byte[BUF_LENGTH];
@@ -59,5 +59,16 @@ public class Server extends Thread {
 			}
 		}
 		socket.close();
+	}
+	
+	public void displayDetails() {
+		System.out.println("===================== SERVER DETAILS =====================");
+		System.out.println("Status: " + (this.running == true ? "Running" : "Not Running"));
+		System.out.println("Port Number: " + this.port);
+		System.out.println("This Server's Chord Port: " + this.chordPort);
+		System.out.println("This Server's Chord ID: " + this.dfs.getChordGUID());
+		System.out.println("This Server's Chord's Info:");
+		this.dfs.getChordInfo();
+		System.out.println("==========================================================");
 	}
 }

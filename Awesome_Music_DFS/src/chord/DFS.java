@@ -314,6 +314,14 @@
  	public void leave() throws Exception {
  		chord.leave();
  	}
+ 	
+ 	public long getChordGUID() {
+ 		return this.chord.guid;
+ 	}
+ 	
+ 	public void getChordInfo() {
+ 		this.chord.print();
+ 	}
 
  	/**
  	 * print the status of the peer in the chord
