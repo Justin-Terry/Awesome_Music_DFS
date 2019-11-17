@@ -24,7 +24,6 @@ public class ServerMain {
 		int portToJoin = input.nextInt();
 		// Start the server
 		new Server(port, chordPort, portToJoin).start();
-
 	}
 
 };

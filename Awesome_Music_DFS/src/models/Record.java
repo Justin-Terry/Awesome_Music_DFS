@@ -34,4 +34,8 @@ public class Record {
 		return song;
 	}
 	
+	public SongItem getSongItem() {
+		return new SongItem(this.song.getTitle(), this.artist.getName(), this.song.getId(), this.release.getName());
+	}
+	
 }

@@ -21,7 +21,7 @@ public class Server extends Thread {
 	private boolean running;
 	private byte[] buf;
 	private DFS dfs;
-	private int port, chordPort, chordJoinedTo;
+	private int port, chordPort, chordJoinedTo, nodeNumber;
 
 	// Creates server and assigns it to a port, 3000.
 	public Server(int port, int chordPort, int portToJoin) throws Exception {
@@ -32,6 +32,7 @@ public class Server extends Thread {
 			this.port = port;
 			this.chordPort = chordPort;
 			this.chordJoinedTo = portToJoin;
+			this.nodeNumber = chordPort % 1000;
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -69,6 +70,12 @@ public class Server extends Thread {
 		System.out.println("This Server's Chord ID: " + this.dfs.getChordGUID());
 		System.out.println("This Server's Chord's Info:");
 		this.dfs.getChordInfo();
+		try {
+			this.dfs.lists();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		System.out.println("==========================================================");
 	}
 }
