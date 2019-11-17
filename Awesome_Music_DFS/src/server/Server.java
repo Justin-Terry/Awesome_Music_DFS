@@ -1,5 +1,6 @@
 package server;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -7,6 +8,7 @@ import java.net.SocketException;
 
 import chord.DFS;
 import chord.DFSCommand;
+import chord.RemoteInputFileStream;
 
 /**
  * LoginServices Class
@@ -62,6 +64,29 @@ public class Server extends Thread {
 		socket.close();
 	}
 	
+	public void appendFiles() {
+		try {
+			dfs.create("chordMusic");
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		for(int i = 0; i < 10; i ++) {
+			try {
+				dfs.append("chordMusic", new RemoteInputFileStream("file" + i + ".json"));
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public void displayDetails() {
 		System.out.println("===================== SERVER DETAILS =====================");
 		System.out.println("Status: " + (this.running == true ? "Running" : "Not Running"));
@@ -70,12 +95,6 @@ public class Server extends Thread {
 		System.out.println("This Server's Chord ID: " + this.dfs.getChordGUID());
 		System.out.println("This Server's Chord's Info:");
 		this.dfs.getChordInfo();
-		try {
-			this.dfs.lists();
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		System.out.println("==========================================================");
 	}
 }

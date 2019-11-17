@@ -23,7 +23,13 @@ public class ServerMain {
 		System.out.print("What port should the chord join? >> ");
 		int portToJoin = input.nextInt();
 		// Start the server
-		new Server(port, chordPort, portToJoin).start();
+		Server s = new Server(port, chordPort, portToJoin);
+		s.start();
+		
+		String command = input.next();
+		if(command.equals("append")) {
+			s.appendFiles();
+		}
 	}
 
 };
