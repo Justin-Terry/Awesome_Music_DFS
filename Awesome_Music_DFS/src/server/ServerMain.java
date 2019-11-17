@@ -2,6 +2,8 @@ package server;
 
 import java.util.Scanner;
 
+import chord.DFS;
+
 /**
  * Song Library Class
  * 
@@ -29,6 +31,8 @@ public class ServerMain {
 		String command = input.next();
 		if(command.equals("append")) {
 			s.appendFiles();
+			SongLibraryServices sls = new SongLibraryServices();
+			System.out.println(sls.getSixSongs(1));
 		}
 	}
 

@@ -7,6 +7,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 
 import chord.DFS;
+import chord.DFS.FilesJson;
 import chord.DFSCommand;
 import chord.RemoteInputFileStream;
 
@@ -28,14 +29,25 @@ public class Server extends Thread {
 	// Creates server and assigns it to a port, 3000.
 	public Server(int port, int chordPort, int portToJoin) throws Exception {
 		try {
-			dfs = new DFS(chordPort);
-			dfs.join("127.0.0.1", portToJoin);
+			this.dfs = new DFS(chordPort);
+			this.dfs.join("127.0.0.1", portToJoin);
+			DFSRepo.getInstance().setDFS(this.dfs);
 			socket = new DatagramSocket(port);
 			this.port = port;
 			this.chordPort = chordPort;
 			this.chordJoinedTo = portToJoin;
 			this.nodeNumber = chordPort % 1000;
 		} catch (SocketException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	public void displayMeta() {
+		try {
+			FilesJson fj = dfs.readMetaData();
+			dfs.writeMetaData(fj);
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

@@ -78,6 +78,8 @@ public class DFS {
 			this.referenceCount = 0;
 			readTS = creationTS;
 		}
+		
+
 
 		public long getGuid() {
 			return guid;
@@ -281,9 +283,10 @@ public class DFS {
 		public void addFileJson(FileJson fileJson) {
 			this.file.add(fileJson);
 		}
-		// public void addNewFile(File f) {
-		// file.add(new FileJson(f));
-		// }
+		
+		public void display() {
+			
+		}
 	};
 
 	int port;
@@ -302,7 +305,7 @@ public class DFS {
 		}
 		return 0;
 	}
-
+	
 	public DFS(int port) throws Exception {
 
 		this.port = port;
@@ -447,7 +450,26 @@ public class DFS {
 	 *            number of block.
 	 */
 	public RemoteInputFileStream read(String fileName, int pageNumber) throws Exception {
-		return null;
+		pageNumber--;
+        RemoteInputFileStream InputStream = null;
+        FilesJson md = readMetaData();
+        for (int i = 0; i < md.getSize(); i++) {
+            if (md.getFile(i).getName().equalsIgnoreCase(fileName)) {
+                ArrayList<PagesJson> pagesList = md.getFile(i).getPages();
+                for (int k = 0; k < pagesList.size(); k++) {
+                    if (k == pageNumber) {
+                        PagesJson pageToRead = pagesList.get(k);
+                        pageToRead.setReadTS(Timestamp.from(Instant.now()));
+                        md.getFile(i).setReadTS(Timestamp.from(Instant.now()));
+                        Long pageGUID = pageToRead.guid;
+                        ChordMessageInterface peer = chord.locateSuccessor(pageGUID);
+                        InputStream = peer.get(pageGUID);
+                    }
+                }
+                writeMetaData(md);
+            }
+        }
+        return InputStream;
 	}
 
 	/**
