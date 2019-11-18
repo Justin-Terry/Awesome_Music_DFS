@@ -60,6 +60,9 @@ public class DFSCommand
             	RemoteInputFileStream ris = new RemoteInputFileStream(result[2]);
             	dfs.append(result[1], ris);
             }
+            if(result[0].equals("rename") && result.length > 2) {
+            	dfs.move(result[1], result[2]);
+            }
             
             line=buffer.readLine();
             

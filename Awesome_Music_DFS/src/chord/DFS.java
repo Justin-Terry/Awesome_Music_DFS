@@ -26,6 +26,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 /* JSON Format
 {"file":
@@ -396,8 +397,23 @@ public class DFS {
 	 *
 	 */
 	public void move(String oldName, String newName) throws Exception {
-		// TODO: Change the name in Metadata
-		// Write Metadata
+		FilesJson files = readMetaData();
+		boolean checkForFile = false;
+		for (int i = 0; i < files.getSize(); i++) {
+			if (files.getFile(i).getName().equalsIgnoreCase(oldName)) {
+				files.getFile(i).setName(newName);
+				files.getFile(i).setWriteTS(Timestamp.from(Instant.now()));
+				checkForFile = true;
+				
+				}
+		}
+		
+		if (checkForFile) {
+			this.writeMetaData(files);
+			System.out.println(oldName + " has been changed to " + newName);
+		}
+		else 
+			System.out.println(oldName + " does not exist. No action was taken.");
 
 	}
 
@@ -438,7 +454,6 @@ public class DFS {
 	 *            Name of the file
 	 */
 	public void delete(String fileName) throws Exception {
-
 	}
 
 	/**
