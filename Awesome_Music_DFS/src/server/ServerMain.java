@@ -32,7 +32,9 @@ public class ServerMain {
 		if(command.equals("append")) {
 			s.appendFiles();
 			SongLibraryServices sls = new SongLibraryServices();
-			System.out.println(sls.getSixSongs(1));
+			sls.searchForSong("pink", "1");
+			sls.searchForSong("pink", "2");
+			
 		}
 	}
 

@@ -3,6 +3,7 @@ package server;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.stream.Collectors;
@@ -45,29 +46,49 @@ public class SongLibraryServices {
 		if (searchParam.equals("")) {
 			return getSixSongs(Integer.parseInt(pageNumber));
 		} else {
-			ArrayList<SongItem> items = new ArrayList<SongItem>();
+			ConcurrentLinkedQueue<SongItem> searchResults = new ConcurrentLinkedQueue();
+			for (int i = 0; i < 10; i++) {
+				try {
+					FilesJson meta = DFSRepo.getInstance().getDFS().readMetaData();
+					Thread thread;
+					RemoteInputFileStream input = DFSRepo.getInstance().getDFS().read("chordMusic",i);
+					input.connect();
+					InputStreamReader is = new InputStreamReader(input);
+					String resultJson = new BufferedReader(is).lines().collect(Collectors.joining("\n"));
+					ArrayList<SongItem> listOfSongItems = new Gson().fromJson(resultJson,
+							new TypeToken<ArrayList<SongItem>>() {
+							}.getType());
+					
+										SearchThread searchThread = new SearchThread(listOfSongItems, searchParam, searchResults, Integer.parseInt(pageNumber));
+					thread = new Thread(searchThread);
+					thread.start();
+					
+
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+			
+			int num = Integer.parseInt(pageNumber);
 			StringBuilder sb = new StringBuilder();
 			sb.append("[");
-
-			for (String recordId : mSongLibrary.getKeySet()) {
-				Record record = mSongLibrary.getRecord(recordId);
-				if (record.getArtist().getName().contains(searchParam)
-						|| record.getSong().getTitle().contains(searchParam)) {
-					items.add(new SongItem(record.getSong().getTitle(), record.getArtist().getName(),
-							record.getSong().getId(), record.getRelease().getName()));
+			for (int i = 0; i < ((num-1) * 6) + 6; i++) {
+				if(i >= ((num-1) * 6)) {
+					if(searchResults.peek() != null) {
+						sb.append(new Gson().toJson(searchResults.poll()));
+					}else {
+						sb.append(new Gson().toJson(new SongItem("","","","")));
+					}
+				}else {
+					searchResults.poll();
 				}
 			}
-
-			int start = (Integer.parseInt(pageNumber) - 1) * 6;
-			for (int i = start; i < start + 6; i++) {
-				if (items.size() > i) {
-					Gson gson = new Gson();
-					sb.append(gson.toJson(items.get(i)));
-				}
-			}
-
 			sb.append("]");
+			
+			System.out.println(sb.toString());
 			return sb.toString();
+
 		}
 	}
 
@@ -90,8 +111,8 @@ public class SongLibraryServices {
 
 			StringBuilder sb = new StringBuilder();
 			sb.append("[");
-			for(int i = 1 * (pageNumber - 1); i < 1 * (pageNumber - 1) + 6; i++) {
-//				results.add(songs.get(i));
+			for (int i = 1 * (pageNumber - 1); i < 1 * (pageNumber - 1) + 6; i++) {
+				// results.add(songs.get(i));
 				sb.append(new Gson().toJson(songs.get(i)));
 			}
 			sb.append("]");
