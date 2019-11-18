@@ -31,6 +31,10 @@ public class ServerMain {
 		String command = input.next();
 		if(command.equals("append")) {
 			s.appendFiles();
+			SongLibraryServices sls = new SongLibraryServices();
+			sls.searchForSong("pink", "1");
+			sls.searchForSong("pink", "2");
+			
 		}
 	}
 
