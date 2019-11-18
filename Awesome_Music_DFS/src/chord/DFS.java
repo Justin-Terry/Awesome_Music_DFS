@@ -288,6 +288,17 @@ public class DFS {
 		public void display() {
 			
 		}
+		
+		public void deleteFile(String fileName) {
+			ListIterator<FileJson> i = file.listIterator();
+			
+			while (i.hasNext()) {
+				FileJson tempFile = i.next();
+				if (tempFile.getName().equalsIgnoreCase(fileName)) {
+					i.remove();
+				}
+			}
+		}
 	};
 
 	int port;
@@ -454,7 +465,26 @@ public class DFS {
 	 *            Name of the file
 	 */
 	public void delete(String fileName) throws Exception {
+		FilesJson files = readMetaData();
+		for (int i = 0; i < files.getSize(); i++) {
+			if (files.getFile(i).getName().equalsIgnoreCase(fileName)) {
+				if (files.getFile(i).getNumberOfPages() > 0) {
+					FileJson file = files.getFile(i);
+					for (int j = 0; j < file.getNumberOfPages(); j ++) {
+						PagesJson page = file.pages.get(j);
+						long guid = page.guid;
+						ChordMessageInterface peer = chord.locateSuccessor(guid);
+						peer.delete(guid);
+					}
+					
+				}
+				files.deleteFile(fileName);
+			}
+		}
+		this.writeMetaData(files);
 	}
+	
+	
 
 	/**
 	 * Read block pageNumber of fileName
