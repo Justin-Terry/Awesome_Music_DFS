@@ -80,19 +80,22 @@ public class SongLibraryServices {
 
 			FilesJson meta = dfs.readMetaData();
 
-			RemoteInputFileStream input = dfs.read("chordMusic", 1);
+			RemoteInputFileStream input = dfs.read("chordMusic", pageNumber);
 			input.connect();
 
-			System.out.println("Searching Page " + 1);
+			System.out.println("Searching Page " + pageNumber);
 			String json = new BufferedReader(new InputStreamReader(input)).lines().collect(Collectors.joining("\n"));
 			ArrayList<SongItem> songs = new Gson().fromJson(json, new TypeToken<ArrayList<SongItem>>() {
 			}.getType());
 
+			StringBuilder sb = new StringBuilder();
+			sb.append("[");
 			for(int i = 1 * (pageNumber - 1); i < 1 * (pageNumber - 1) + 6; i++) {
-				results.add(songs.get(i));
+//				results.add(songs.get(i));
+				sb.append(new Gson().toJson(songs.get(i)));
 			}
-			
-			return new Gson().toJson(results);
+			sb.append("]");
+			return sb.toString();
 
 		} catch (Exception e) {
 			e.printStackTrace();
