@@ -36,10 +36,9 @@ public class PlaylistServices {
 	 */
 	public String getPlaylists(String userId) {
 		try {
+			playlists.clear();
 			loadPlaylists(userId);
 			Gson gson = new Gson();
-			System.out.println("PLAYLISTS: " + playlists);
-			System.out.println("PLAYLISTS JSON: " + gson.toJson(playlists));
 			return gson.toJson(playlists);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
