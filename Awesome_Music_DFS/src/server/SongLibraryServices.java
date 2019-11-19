@@ -35,11 +35,10 @@ public class SongLibraryServices {
 	}
 
 	/**
-	 * Searches the SongLibrary for songs where the artist name or song title
+	 * Searches the DFS for songs where the artist name or song title or album title
 	 * contains the string searched for
 	 * 
-	 * @param search
-	 *            parameter, page number of results
+	 * @param search parameter, page number of results
 	 * @return a page of the search result
 	 */
 	public String searchForSong(String searchParam, String pageNumber) {
@@ -86,12 +85,14 @@ public class SongLibraryServices {
 			}
 			sb.append("]");
 			
-			System.out.println(sb.toString());
+			System.out.println("RESPONSE TO SEND: " + sb.toString());
 			return sb.toString();
 
 		}
 	}
 
+	
+	// This method just pulls the first six songs off the current node
 	public String getSixSongs(int pageNumber) {
 		ArrayList<SongItem> results = new ArrayList();
 		try {

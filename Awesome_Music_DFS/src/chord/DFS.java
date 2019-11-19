@@ -79,8 +79,6 @@ public class DFS {
 			this.referenceCount = 0;
 			readTS = creationTS;
 		}
-		
-
 
 		public long getGuid() {
 			return guid;
@@ -185,6 +183,7 @@ public class DFS {
 			this.writeTS = Timestamp.from(Instant.now());
 			long pageSize = page.getSize();
 			this.size += pageSize;
+			this.numberOfPages++;
 			this.pages.add(page);
 		}
 
@@ -229,7 +228,7 @@ public class DFS {
 		}
 
 		public Long getNumberOfPages() {
-			return numberOfPages;
+			return (long) this.pages.size();
 		}
 
 		public void setNumberOfPages(Long numberOfPages) {
