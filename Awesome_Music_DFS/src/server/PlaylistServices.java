@@ -103,13 +103,17 @@ public class PlaylistServices {
 		}
 	}
 
-	public String addSongToPlaylist(String userId, String playListName, SongItem songId) throws IOException {
+	public String addSongToPlaylist(String userId, String playListName, String songId, String title, String artist, String record) throws IOException {
 		try {
 			loadAllPlaylists();
+			
+			SongItem t = new SongItem(title, artist, songId, record);
+	
 
 			for (Playlist p : allPlaylists) {
 				if (p.getPlaylistName().equals(playListName) && userId.equals(String.valueOf(p.getUser_id()))) {
-					p.addPlaylist(songId);
+					p.addPlaylist(t);
+					System.out.println(p.toString());
 				}
 			}
 			Gson gson = new Gson();
