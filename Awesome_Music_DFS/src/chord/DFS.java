@@ -283,14 +283,14 @@ public class DFS {
 		public void addFileJson(FileJson fileJson) {
 			this.file.add(fileJson);
 		}
-		
+
 		public void display() {
-			
+
 		}
-		
+
 		public void deleteFile(String fileName) {
 			ListIterator<FileJson> i = file.listIterator();
-			
+
 			while (i.hasNext()) {
 				FileJson tempFile = i.next();
 				if (tempFile.getName().equalsIgnoreCase(fileName)) {
@@ -316,7 +316,7 @@ public class DFS {
 		}
 		return 0;
 	}
-	
+
 	public DFS(int port) throws Exception {
 
 		this.port = port;
@@ -414,15 +414,14 @@ public class DFS {
 				files.getFile(i).setName(newName);
 				files.getFile(i).setWriteTS(Timestamp.from(Instant.now()));
 				checkForFile = true;
-				
-				}
+
+			}
 		}
-		
+
 		if (checkForFile) {
 			this.writeMetaData(files);
 			System.out.println(oldName + " has been changed to " + newName);
-		}
-		else 
+		} else
 			System.out.println(oldName + " does not exist. No action was taken.");
 
 	}
@@ -469,21 +468,19 @@ public class DFS {
 			if (files.getFile(i).getName().equalsIgnoreCase(fileName)) {
 				if (files.getFile(i).getNumberOfPages() > 0) {
 					FileJson file = files.getFile(i);
-					for (int j = 0; j < file.getNumberOfPages(); j ++) {
+					for (int j = 0; j < file.getNumberOfPages(); j++) {
 						PagesJson page = file.pages.get(j);
 						long guid = page.guid;
 						ChordMessageInterface peer = chord.locateSuccessor(guid);
 						peer.delete(guid);
 					}
-					
+
 				}
 				files.deleteFile(fileName);
 			}
 		}
 		this.writeMetaData(files);
 	}
-	
-	
 
 	/**
 	 * Read block pageNumber of fileName
@@ -495,25 +492,25 @@ public class DFS {
 	 */
 	public RemoteInputFileStream read(String fileName, int pageNumber) throws Exception {
 		pageNumber--;
-        RemoteInputFileStream InputStream = null;
-        FilesJson md = readMetaData();
-        for (int i = 0; i < md.getSize(); i++) {
-            if (md.getFile(i).getName().equalsIgnoreCase(fileName)) {
-                ArrayList<PagesJson> pagesList = md.getFile(i).getPages();
-                for (int k = 0; k < pagesList.size(); k++) {
-                    if (k == pageNumber) {
-                        PagesJson pageToRead = pagesList.get(k);
-                        pageToRead.setReadTS(Timestamp.from(Instant.now()));
-                        md.getFile(i).setReadTS(Timestamp.from(Instant.now()));
-                        Long pageGUID = pageToRead.guid;
-                        ChordMessageInterface peer = chord.locateSuccessor(pageGUID);
-                        InputStream = peer.get(pageGUID);
-                    }
-                }
-                writeMetaData(md);
-            }
-        }
-        return InputStream;
+		RemoteInputFileStream InputStream = null;
+		FilesJson md = readMetaData();
+		for (int i = 0; i < md.getSize(); i++) {
+			if (md.getFile(i).getName().equalsIgnoreCase(fileName)) {
+				ArrayList<PagesJson> pagesList = md.getFile(i).getPages();
+				for (int k = 0; k < pagesList.size(); k++) {
+					if (k == pageNumber) {
+						PagesJson pageToRead = pagesList.get(k);
+						pageToRead.setReadTS(Timestamp.from(Instant.now()));
+						md.getFile(i).setReadTS(Timestamp.from(Instant.now()));
+						Long pageGUID = pageToRead.guid;
+						ChordMessageInterface peer = chord.locateSuccessor(pageGUID);
+						InputStream = peer.get(pageGUID);
+					}
+				}
+				writeMetaData(md);
+			}
+		}
+		return InputStream;
 	}
 
 	/**
@@ -528,17 +525,23 @@ public class DFS {
 		FilesJson theData = this.readMetaData();
 		for (int i = 0; i < theData.getSize(); i++) {
 			if (theData.getFile(i).getName().toLowerCase().equals(fileName.toLowerCase())) {
+				// For each file in the DFS
+				// Get the file
 				FileJson theFile = theData.getFile(i);
+				// Check how big the file is
 				int dataSize = data.available();
 				System.out.println("Datasize: " + dataSize);
+				// Update write timestamp
 				theFile.setWriteTS(Timestamp.from(Instant.now()));
+				// Assign GUID
 				long pagesGuid = md5(fileName + Timestamp.from(Instant.now()));
+				// Get the successor node where the data should be stored
 				ChordMessageInterface succ = this.chord.locateSuccessor(pagesGuid);
-				int point = 0;
+				// Put the file in the node
 				succ.put(pagesGuid, data);
+				// Update the meta data to reflect where the new file is
 				theFile.addPage(new PagesJson(pagesGuid, dataSize, 0, theFile.getWriteTS(), theFile.getWriteTS()));
-			} 
-			System.out.println("Appended item " + i);
+			}
 		}
 		this.writeMetaData(theData);
 
