@@ -38,6 +38,8 @@ public class PlaylistServices {
 		try {
 			loadPlaylists(userId);
 			Gson gson = new Gson();
+			System.out.println("PLAYLISTS: " + playlists);
+			System.out.println("PLAYLISTS JSON: " + gson.toJson(playlists));
 			return gson.toJson(playlists);
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
@@ -55,11 +57,13 @@ public class PlaylistServices {
 		Gson gson1 = new Gson();
 		JsonReader pReader = new JsonReader(new FileReader(PLAYLISTS_PATH));
 		Playlist[] pLists = gson1.fromJson(pReader, Playlist[].class);
+		System.out.println("PLists: " + pLists);
 		for (Playlist p : pLists) {
 			if (userId.equals(String.valueOf(p.getUser_id()))) {
 				playlists.add(p);
 			}
 		}
+		
 	}
 
 	private void loadAllPlaylists() throws FileNotFoundException {
