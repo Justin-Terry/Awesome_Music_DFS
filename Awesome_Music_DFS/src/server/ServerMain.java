@@ -15,7 +15,7 @@ public class ServerMain {
 
 	public static void main(String[] args) throws NumberFormatException, Exception {
 		// Create the song library
-		SongLibrary.getInstance();
+		//SongLibrary.getInstance();
 		
 		System.out.print("What port for server? >> ");
 		Scanner input = new Scanner(System.in);

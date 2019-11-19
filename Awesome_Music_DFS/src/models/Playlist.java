@@ -13,7 +13,7 @@ public class Playlist {
 	}
 
 	int user_id;
-	ArrayList<String> playlist;
+	ArrayList<SongItem> playlist;
 	String playlistName;
 	
 
@@ -26,7 +26,7 @@ public void setUser_id(int user_id) {
 		this.user_id = user_id;
 	}
 
-	public void setPlaylist(ArrayList<String> playlist) {
+	public void setPlaylist(ArrayList<SongItem> playlist) {
 		this.playlist = playlist;
 	}
 
@@ -45,7 +45,7 @@ public void setUser_id(int user_id) {
 		playlistName = name;
 	}
 	
-	public Playlist(int id, String name, String[] playlist) {
+	public Playlist(int id, String name, SongItem[] playlist) {
 		user_id = id;
 		this.playlist = new ArrayList<>();
 		playlistName = name;
@@ -59,14 +59,14 @@ public void setUser_id(int user_id) {
  * @param r	A Record object
  */
 	public void addPlaylist(Record r) {
-		playlist.add(r.getSong().getId());
+		playlist.add(new SongItem(r.getSong().getTitle(), r.getArtist().toString(), r.getSong().getId(), r.toString()));
 	}
 
 	/**
 	 * Adds a String r to the Playlist
 	 * @param r	A String object
 	 */
-		public void addPlaylist(String r) {
+		public void addPlaylist(SongItem r) {
 			playlist.add(r);
 		}
 	
@@ -105,7 +105,7 @@ public void setUser_id(int user_id) {
  * Gets the playlist
  * @return playlist
  */
-	public ArrayList<String> getPlaylist() {
+	public ArrayList<SongItem> getPlaylist() {
 		return playlist;
 	}
 

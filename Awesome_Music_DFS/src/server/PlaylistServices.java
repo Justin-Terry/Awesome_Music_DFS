@@ -10,6 +10,7 @@ import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 
 import models.Playlist;
+import models.SongItem;
 
 /**
  * PlaylistServices Class
@@ -98,7 +99,7 @@ public class PlaylistServices {
 		}
 	}
 
-	public String addSongToPlaylist(String userId, String playListName, String songId) throws IOException {
+	public String addSongToPlaylist(String userId, String playListName, SongItem songId) throws IOException {
 		try {
 			loadAllPlaylists();
 

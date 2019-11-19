@@ -28,10 +28,10 @@ import models.SongItem;
 
 public class SongLibraryServices {
 
-	private static SongLibrary mSongLibrary;
+	//private static SongLibrary mSongLibrary;
 
 	public SongLibraryServices() {
-		mSongLibrary = SongLibrary.getInstance();
+		//mSongLibrary = SongLibrary.getInstance();
 	}
 
 	/**
@@ -132,21 +132,21 @@ public class SongLibraryServices {
 	 *            parameter
 	 * @return a JSON version of a SongItem as a string
 	 */
-	public String searchForSongById(String searchParam) {
-		ArrayList<SongItem> items = new ArrayList<SongItem>();
-		StringBuilder sb = new StringBuilder();
-
-		for (String recordId : mSongLibrary.getKeySet()) {
-			Record record = mSongLibrary.getRecord(recordId);
-			if (record.getSong().getId().equals(searchParam)) {
-				items.add(new SongItem(record.getSong().getTitle(), record.getArtist().getName(),
-						record.getSong().getId(), record.getRelease().getName()));
-			}
-		}
-
-		Gson gson = new Gson();
-		sb.append(gson.toJson(items.get(0)));
-
-		return sb.toString();
-	}
+//	public String searchForSongById(String searchParam) {
+//		ArrayList<SongItem> items = new ArrayList<SongItem>();
+//		StringBuilder sb = new StringBuilder();
+//
+//		for (String recordId : mSongLibrary.getKeySet()) {
+//			Record record = mSongLibrary.getRecord(recordId);
+//			if (record.getSong().getId().equals(searchParam)) {
+//				items.add(new SongItem(record.getSong().getTitle(), record.getArtist().getName(),
+//						record.getSong().getId(), record.getRelease().getName()));
+//			}
+//		}
+//
+//		Gson gson = new Gson();
+//		sb.append(gson.toJson(items.get(0)));
+//
+//		return sb.toString();
+//	}
 }
