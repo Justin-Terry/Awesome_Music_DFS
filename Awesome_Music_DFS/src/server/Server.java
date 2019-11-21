@@ -83,6 +83,7 @@ public class Server extends Thread {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
+		for(int j = 0; j < 3; j++) {
 		for(int i = 0; i < 10; i ++) {
 			try {
 				dfs.append("chordMusic", new RemoteInputFileStream("file" + i + ".json"));
@@ -96,6 +97,7 @@ public class Server extends Thread {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
 		}
 	}
 	
