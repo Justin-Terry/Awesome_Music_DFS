@@ -4,6 +4,8 @@ import java.rmi.RemoteException;
 
 import chord.Chord;
 import chord.ChordMessageInterface;
+import chord.Transaction;
+import chord.Transaction.Vote;
 
 public class Coordinator extends Chord implements ChordMessageInterface{
 	
@@ -17,9 +19,9 @@ public class Coordinator extends Chord implements ChordMessageInterface{
 		super(port, guid);
 	}
 	
-	public boolean canCommit(Transaction t)
+	public Vote canCommit(Transaction t)
 	{
-		return false;
+		return Vote.valueOf("NO");
 	}
 	
 	public void doCommit(Transaction t)
@@ -33,12 +35,3 @@ public class Coordinator extends Chord implements ChordMessageInterface{
 	}
 }
 
-class Transaction
-{
-	public enum Operation { WRITE, DELETE};
-	public enum Vote { YES, NO};
-	Long TransactionId;
-	Vote vote;
-	String fileName;
-	Long pageIndex;
-}
