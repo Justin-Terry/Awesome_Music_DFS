@@ -28,7 +28,12 @@ public class ServerMain {
 		
 		String command = input.next();
 		if(command.equals("append")) {
-			s.appendFiles();			
+			s.appendFiles();	
+//			DFSRepo dfs = DFSRepo.getInstance();
+//
+//			SongLibraryServices sls = new SongLibraryServices();
+//			sls.searchForSong("love", "2");
+//			dfs.getDFS().test();
 		}
 	}
 

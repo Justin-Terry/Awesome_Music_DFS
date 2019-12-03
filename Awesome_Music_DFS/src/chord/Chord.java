@@ -11,9 +11,17 @@ package chord;
 import java.rmi.*;
 import java.rmi.registry.*;
 import java.rmi.server.*;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.net.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import chord.DFS.PagesJson;
+import models.SongItem;
 
 import java.io.*;
 
@@ -26,7 +34,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 {
     // Numbers of fingers
     public static final int M = 2;
-
+    private List<Long> guids;
      // rmi registry for lookup the remote objects.
     Registry registry;
     // Successor peeer
@@ -41,6 +49,11 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     long guid;
     // path prefix
     String prefix;
+    // write timestamp
+    Timestamp lastWrite;
+    // read timestamp
+    Timestamp lastRead;
+    
 
 
 
@@ -55,7 +68,11 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
  * @param guid the global unique id of the peer.
  */
     public Chord(int port, long guid) throws RemoteException {
+    	this.lastWrite = Timestamp.from(Instant.now());
+    	this.lastRead = Timestamp.from(Instant.now());
+
         int j;
+        guids = new ArrayList();
         // Initialize the variables
         prefix = "./" + guid + "/repository/";
 	    finger = new ChordMessageInterface[M];
@@ -119,14 +136,16 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     	stream.connect();
         try {
           String fileName = prefix + guidObject;
+          guids.add(guidObject);
           FileOutputStream output = new FileOutputStream(fileName);
           while (stream.available() > 0)
               output.write(stream.read());
           output.close();
-      }
-      catch (IOException e) {
-          System.out.println(e);
-      }
+          this.lastWrite = Timestamp.from(Instant.now());
+	    }
+	    catch (IOException e) {
+	        System.out.println(e);
+	    }
     }
 
     /**
@@ -137,6 +156,8 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
     public void put(long guidObject, String text) throws RemoteException {
         try {
           String fileName = prefix + guidObject;
+//          guids.add(guidObject);
+//          System.out.println("ADDING: " + guidObject);
           FileOutputStream output = new FileOutputStream(fileName);
           output.write(text.getBytes());
           output.close();
@@ -153,6 +174,7 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
         RemoteInputFileStream file = null;
         try {
              file = new RemoteInputFileStream(prefix + guidObject);
+             this.lastRead = Timestamp.from(Instant.now());
         } catch (IOException e)
         {
             throw(new RemoteException("File does not exists"));
@@ -553,7 +575,15 @@ public class Chord extends java.rmi.server.UnicastRemoteObject implements ChordM
 	       System.out.println("Cannot retrive id of successor or predecessor");
         }
     }
-
+    
+    public Transaction.Vote canCommit(Transaction t) {
+		if(this.lastRead.before(lastWrite)) {
+			return Transaction.Vote.NO;
+		}else {
+			return Transaction.Vote.YES;
+		} 	
+    }
+    
 }
 
 

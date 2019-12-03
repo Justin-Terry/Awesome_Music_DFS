@@ -84,20 +84,20 @@ public class Server extends Thread {
 			e1.printStackTrace();
 		}
 		for(int j = 0; j < 3; j++) {
-		for(int i = 0; i < 10; i ++) {
-			try {
-				dfs.append("chordMusic", new RemoteInputFileStream("file" + i + ".json"));
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			for(int i = 0; i < 10; i ++) {
+				try {
+					dfs.append("chordMusic", new RemoteInputFileStream("file" + i + ".json"));
+				} catch (FileNotFoundException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-		}
 		}
 	}
 	
