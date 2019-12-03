@@ -547,22 +547,22 @@ public class DFS {
 
 	}
 	
-	public Transaction.Vote checkCoordinator(){
-		System.out.println("VOTE: " + this.chord.canCommit(new Transaction()).toString());
-		return this.chord.canCommit(new Transaction());
-	}
-
-	public void test() throws RemoteException {
-		ChordMessageInterface testChord = this.chord.predecessor;
-		if(this.checkCoordinator() == Transaction.Vote.YES) {
-			while(testChord.getId() != this.chord.getId()) {
-				System.out.println(chord.getId() + " canCommit = " + testChord.canCommit(new Transaction()));
-				testChord = testChord.getPredecessor();
-			}
-		}
-		
-		
-	}
+//	public Transaction.Vote checkCoordinator(){
+//		System.out.println("VOTE: " + this.chord.canCommit(new Transaction()).toString());
+//		return this.chord.canCommit(new Transaction());
+//	}
+//
+//	public void test() throws RemoteException {
+//		ChordMessageInterface testChord = this.chord.predecessor;
+//		if(this.checkCoordinator() == Transaction.Vote.YES) {
+//			while(testChord.getId() != this.chord.getId()) {
+//				System.out.println(chord.getId() + " canCommit = " + testChord.canCommit(new Transaction()));
+//				testChord = testChord.getPredecessor();
+//			}
+//		}
+//		
+//		
+//	}
 	
 	public static PagesJson PagesJson(String string, Timestamp timestamp, int i) {
 		// TODO Auto-generated method stub
