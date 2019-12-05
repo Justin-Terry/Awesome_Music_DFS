@@ -66,6 +66,13 @@ public class DFSCommand
             if(result[0].equals("delete") && result.length > 1) {
             	dfs.delete(result[1]);
             }
+            if(result[0].equals("pull")){
+            	dfs.pull();
+            }
+            if(result[0].equals("push") && result.length > 1) {
+            	// Pass the file name that is going to be pushed (i.e. the whole file system)
+            	dfs.push(result[1]);
+            }
             
             line=buffer.readLine();
             

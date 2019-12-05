@@ -547,22 +547,16 @@ public class DFS {
 
 	}
 	
-//	public Transaction.Vote checkCoordinator(){
-//		System.out.println("VOTE: " + this.chord.canCommit(new Transaction()).toString());
-//		return this.chord.canCommit(new Transaction());
-//	}
-//
-//	public void test() throws RemoteException {
-//		ChordMessageInterface testChord = this.chord.predecessor;
-//		if(this.checkCoordinator() == Transaction.Vote.YES) {
-//			while(testChord.getId() != this.chord.getId()) {
-//				System.out.println(chord.getId() + " canCommit = " + testChord.canCommit(new Transaction()));
-//				testChord = testChord.getPredecessor();
-//			}
-//		}
-//		
-//		
-//	}
+	public void pull() {
+		// Return the whole file system and save it locally
+		// Update the read time stamp on the metadata
+	}
+	
+	// Push the whole file to the DFS
+	// Essentially break up the file and run append again
+	public void push(String filename) {
+		
+	}
 	
 	public static PagesJson PagesJson(String string, Timestamp timestamp, int i) {
 		// TODO Auto-generated method stub
