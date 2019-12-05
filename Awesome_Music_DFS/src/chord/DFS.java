@@ -263,9 +263,11 @@ public class DFS {
 
 	public class FilesJson {
 		List<FileJson> file;
+		Timestamp lastwrite;
 
 		public FilesJson() {
 			file = new ArrayList<FileJson>();
+			lastwrite = Timestamp.from(Instant.now());
 		}
 
 		public int getSize() {
@@ -278,10 +280,12 @@ public class DFS {
 
 		public void setFile(List<FileJson> file) {
 			this.file = file;
+			lastwrite = Timestamp.from(Instant.now());
 		}
 
 		public void addFileJson(FileJson fileJson) {
 			this.file.add(fileJson);
+			lastwrite = Timestamp.from(Instant.now());
 		}
 
 		public void display() {
@@ -290,13 +294,18 @@ public class DFS {
 
 		public void deleteFile(String fileName) {
 			ListIterator<FileJson> i = file.listIterator();
-
+			
 			while (i.hasNext()) {
 				FileJson tempFile = i.next();
 				if (tempFile.getName().equalsIgnoreCase(fileName)) {
 					i.remove();
 				}
 			}
+			lastwrite = Timestamp.from(Instant.now());
+		}
+		
+		public Timestamp getLastWrite() {
+			return this.lastwrite;
 		}
 	};
 
@@ -548,14 +557,28 @@ public class DFS {
 	}
 	
 	public void pull() {
-		// Return the whole file system and save it locally
+		// Return the whole file system and save it locally to this.chord's temp folder.
 		// Update the read time stamp on the metadata
 	}
 	
-	// Push the whole file to the DFS
+	// Push the whole file system from this.chord's temp file to the DFS
 	// Essentially break up the file and run append again
 	public void push(String filename) {
 		
+	}
+	
+	public boolean canCommit(Timestamp lastRead) {
+		try {
+			FilesJson meta = this.readMetaData();
+			Timestamp lastWrite = meta.getLastWrite();
+			if(lastWrite.before(lastRead)) {
+				return true;
+			}
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
 	}
 	
 	public static PagesJson PagesJson(String string, Timestamp timestamp, int i) {
