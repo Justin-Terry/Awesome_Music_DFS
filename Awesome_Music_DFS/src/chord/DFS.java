@@ -555,10 +555,13 @@ public class DFS {
 		this.writeMetaData(theData);
 
 	}
-	
-	public void pull() {
-		// Return the whole file system and save it locally to this.chord's temp folder.
-		// Update the read time stamp on the metadata
+
+	// Return the whole file system and save it locally to this.chord's temp folder.
+	// Update the read time stamp on the metadata
+	public void pull() throws Exception {
+		FilesJson file = this.readMetaData();
+		File tmp = File.createTempFile("data", ".tmp", new File("" + chord.guid +"/tmp"));
+		System.out.println("Temp file On Default Location: " + tmp.getAbsolutePath());
 	}
 	
 	// Push the whole file system from this.chord's temp file to the DFS
