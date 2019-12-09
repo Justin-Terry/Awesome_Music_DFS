@@ -562,6 +562,28 @@ public class DFS {
 		FilesJson file = this.readMetaData();
 		File tmp = File.createTempFile("data", ".tmp", new File("" + chord.guid +"/tmp"));
 		System.out.println("Temp file On Default Location: " + tmp.getAbsolutePath());
+		
+		BufferedWriter temp = null;
+
+		try {
+		    FileWriter fstream = new FileWriter(tmp.getAbsolutePath(), true); //true tells to append data.
+		    temp = new BufferedWriter(fstream);
+		    
+		    for(int i = 0; i < file.getSize(); i++) {
+		    	temp.write("\n"+file.getFile(i));
+		    }
+		    
+		}
+
+		catch (IOException e) {
+		    System.err.println("Error: " + e.getMessage());
+		}
+
+		finally {
+		    if(temp != null) {
+		        temp.close();
+		    }
+		}
 	}
 	
 	// Push the whole file system from this.chord's temp file to the DFS
