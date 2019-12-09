@@ -57,7 +57,7 @@ public class DFSCommand
             	dfs.create(result[1]);
             }
             if(result[0].equals("append")) {
-            	RemoteInputFileStream ris = new RemoteInputFileStream(result[2]);
+            	RemoteInputFileStream ris = new RemoteInputFileStream(result[1]);
             	dfs.append(result[1], ris);
             }
             if(result[0].equals("move") && result.length > 2) {

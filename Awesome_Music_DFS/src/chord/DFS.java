@@ -561,12 +561,13 @@ public class DFS {
 	public void pull() throws Exception {
 		FilesJson file = this.readMetaData();
 		File tmp = File.createTempFile("data", ".tmp", new File("" + chord.guid +"/tmp"));
+		FileWriter fstream = new FileWriter(tmp.getAbsolutePath(), true); //true tells to append data.
 		System.out.println("Temp file On Default Location: " + tmp.getAbsolutePath());
 		
 		BufferedWriter temp = null;
 
 		try {
-		    FileWriter fstream = new FileWriter(tmp.getAbsolutePath(), true); //true tells to append data.
+		    
 		    temp = new BufferedWriter(fstream);
 		    
 		    for(int i = 0; i < file.getSize(); i++) {
@@ -582,6 +583,7 @@ public class DFS {
 		finally {
 		    if(temp != null) {
 		        temp.close();
+		        fstream.close();
 		    }
 		}
 	}
