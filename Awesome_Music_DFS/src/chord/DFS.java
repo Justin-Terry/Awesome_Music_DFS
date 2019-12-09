@@ -326,9 +326,9 @@ public class DFS {
 		}
 		return 0;
 	}
-
+private ArrayList<Transaction> t;
 	public DFS(int port) throws Exception {
-
+		t = new ArrayList<>();
 		this.port = port;
 		long guid = md5("" + port);
 		chord = new Chord(port, guid);
@@ -585,6 +585,8 @@ public class DFS {
 			
 		}
 		fw.close();
+		t.add(new Transaction(md5(tmp.getName()), tmp.getName()));
+		
 	}
 	
 	// Push the whole file system from this.chord's temp file to the DFS

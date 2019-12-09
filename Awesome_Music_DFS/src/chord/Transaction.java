@@ -1,5 +1,7 @@
 package chord;
 
+import java.sql.Timestamp;
+
 public class Transaction
 {
 	public enum Operation { WRITE, DELETE};
@@ -9,13 +11,14 @@ public class Transaction
 	private Operation operation;
 	private String fileName;
 	private Long pageIndex;
+	private Timestamp t;
 	
-	public Transaction(Long tId, String fn, Long pIndex) {
+	public Transaction(Long tId, String fn ) {
 		TransactionId = tId;
 		fileName = fn;
-		pageIndex = pIndex;
 		vote = null;
 		operation = null;
+		t = new Timestamp(System.currentTimeMillis());
 	}
 	
 	public Long getTransactionId() {
