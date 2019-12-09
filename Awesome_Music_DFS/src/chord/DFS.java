@@ -17,12 +17,13 @@ package chord;
 import java.rmi.*;
 import java.net.*;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.io.*;
 import java.nio.file.*;
 import java.math.BigInteger;
 import java.security.*;
 import com.google.gson.Gson;
-import java.io.InputStream;
+
 import java.util.*;
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -559,33 +560,31 @@ public class DFS {
 	// Return the whole file system and save it locally to this.chord's temp folder.
 	// Update the read time stamp on the metadata
 	public void pull() throws Exception {
-		FilesJson file = this.readMetaData();
+		FilesJson files = this.readMetaData();
 		File tmp = File.createTempFile("data", ".tmp", new File("" + chord.guid +"/tmp"));
-		FileWriter fstream = new FileWriter(tmp.getAbsolutePath(), true); //true tells to append data.
 		System.out.println("Temp file On Default Location: " + tmp.getAbsolutePath());
+		FileWriter fw = new FileWriter(tmp, true);
 		
-		BufferedWriter temp = null;
+		for (int i = 0; i < files.getSize(); i++) {
+			System.out.println("File: " + files.getFile(i).toString());
+			FileJson file = files.getFile(i);
+			ArrayList<PagesJson> pages = file.getPages();
 
-		try {
-		    
-		    temp = new BufferedWriter(fstream);
-		    
-		    for(int i = 0; i < file.getSize(); i++) {
-		    	temp.write("\n"+file.getFile(i));
-		    }
-		    
+			for (int j = 0; j< pages.size(); j++) {
+				System.out.println("Page: " + pages.get(j).getGuid());
+				long pageguid = pages.get(j).getGuid();
+				ChordMessageInterface succ = this.chord.locateSuccessor(pageguid);
+				RemoteInputFileStream  is = succ.get(pageguid);
+				is.connect();
+//				System.out.println(is.toString());
+				InputStreamReader isreader = new InputStreamReader(is);
+				String resultJson = new BufferedReader(isreader).lines().collect(Collectors.joining("\n"));
+//				System.out.println(resultJson);
+				fw.append(resultJson + " \n");
+			}
+			
 		}
-
-		catch (IOException e) {
-		    System.err.println("Error: " + e.getMessage());
-		}
-
-		finally {
-		    if(temp != null) {
-		        temp.close();
-		        fstream.close();
-		    }
-		}
+		fw.close();
 	}
 	
 	// Push the whole file system from this.chord's temp file to the DFS
