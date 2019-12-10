@@ -33,8 +33,8 @@ public class Transaction
 		this.fileName = fileName;
 	}
 
-	public Long getPageIndex() {
-		return pageIndex;
+	public Timestamp getTimestamp() {
+		return t;
 	}
 
 	public void setPageIndex(Long pageIndex) {

@@ -585,14 +585,46 @@ private ArrayList<Transaction> t;
 			
 		}
 		fw.close();
+		readMetaData();
 		t.add(new Transaction(md5(tmp.getName()), tmp.getName()));
 		
 	}
 	
 	// Push the whole file system from this.chord's temp file to the DFS
 	// Essentially break up the file and run append again
-	public void push(String filename) {
-		
+	public void push() throws IOException {
+		if(t.size() != 0) {
+			if(canCommit(t.get(t.size()-1).getTimestamp())){
+				Scanner in = new Scanner(new File("" + chord.guid +"/tmp/" + t.get(t.size()-1).getFileName()));
+				int i = 0;
+				int count = 0;
+				while(in.hasNextLine()) {
+						File f = new File("file" + i + ".json");
+						FileWriter fw = new FileWriter(f, true);
+						fw.write(in.nextLine());
+						
+							try {
+								append("chordMusic", new RemoteInputFileStream(f.getAbsolutePath()));
+							} catch (FileNotFoundException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							} catch (Exception e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						
+					i++;
+					if(i == 10) {
+						i = 0;
+					}
+				}
+			}else {
+			}
+		}else {
+		}
 	}
 	
 	public boolean canCommit(Timestamp lastRead) {
