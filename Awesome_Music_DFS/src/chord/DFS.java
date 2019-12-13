@@ -622,6 +622,7 @@ private ArrayList<Transaction> t;
 					}
 				}
 			}else {
+				System.out.println("Cannot be pushed, please pull first.");
 			}
 		}else {
 		}
