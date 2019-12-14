@@ -592,9 +592,19 @@ private ArrayList<Transaction> t;
 	
 	// Push the whole file system from this.chord's temp file to the DFS
 	// Essentially break up the file and run append again
-	public void push() throws IOException {
+	public void push() throws Exception {
 		if(t.size() != 0) {
 			if(canCommit(t.get(t.size()-1).getTimestamp())){
+				FilesJson files = this.readMetaData();
+				for(int i = 0; i < files.getSize(); i++) {
+					for(int j = 0; j < files.getFile(i).getPages().size(); j++) {
+						files.getFile(i).getPages().remove(j);
+						System.out.println("Deleting page " + j);
+					}
+					files.deleteFile(files.getFile(i).getName());
+					System.out.println("Deleting file " + i);
+					
+				}
 				Scanner in = new Scanner(new File("" + chord.guid +"/tmp/" + t.get(t.size()-1).getFileName()));
 				int i = 0;
 				int count = 0;
@@ -605,6 +615,8 @@ private ArrayList<Transaction> t;
 						
 							try {
 								append("chordMusic", new RemoteInputFileStream(f.getAbsolutePath()));
+
+								System.out.println(i);
 							} catch (FileNotFoundException e) {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
@@ -621,10 +633,12 @@ private ArrayList<Transaction> t;
 						i = 0;
 					}
 				}
+				System.out.println("Push completed");
 			}else {
 				System.out.println("Cannot be pushed, please pull first.");
 			}
 		}else {
+			System.out.println("Cannot be pushed, please pull first.");
 		}
 	}
 	
